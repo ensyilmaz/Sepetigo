@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title> SEPETİGO | Hoş Geldiniz </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        /* Stil aynen kalsın */
+        html, body {
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #5a86ff 0%, #a7c7ff 100%);
+            color: #222;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        h1 {
+            width: 100%;
+            color: #fff;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
+            text-align: center;
+            margin-bottom: 20px;
+            user-select: none;
+            font-size: 2em;
+        }
+        #container {
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+            max-width: 100vw;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #last-scanned {
+            background: rgba(255 255 255 / 0.9);
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+            padding: 20px;
+            width: 320px;
+            height: 540px;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        #last-scanned h2 {
+            color: #1a73e8;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #last-scanned img {
+            max-width: 280px;
+            max-height: 280px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        #last-scanned #product-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #0b63e5;
+            text-align: center;
+            min-height: 36px;
+            user-select: text;
+        }
+        #video-container {
+            width: 640px;
+            max-width: 90vw;
+            height: 480px;
+            border-radius: 15px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            background: #000;
+            overflow: hidden;
+            position: relative;
+            margin-top: 40px;
+            box-sizing: border-box;
+        }
+        #video-container canvas, #video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #products-list {
+            background: rgba(255 255 255 / 0.9);
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+            padding: 20px;
+            width: 320px;
+            height: 540px;
+            overflow-y: auto;
+            user-select: none;
+            box-sizing: border-box;
+        }
+        #products-list h2 {
+            margin-top: 0;
+            color: #1a73e8;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        #products-list ul {
+            list-style-type: none;
+            padding-left: 0;
+            max-height: 470px;
+            overflow-y: auto;
+            margin: 0;
+        }
+        #products-list li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ccc;
+            font-weight: 600;
+            color: #222;
+            transition: background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        #products-list li:hover {
+            background-color: #e6f0ff;
+        }
+        .count-badge {
+            background-color: #c0392b;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            user-select: none;
+            margin-left: 10px;
+        }
+        /* Yeni quantity controls */
+        .quantity-controls {
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            user-select: none;
+        }
+        .quantity-controls button {
+            background-color: #1a73e8;
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .quantity-controls button:hover {
+            background-color: #0b63e5;
+        }
+        .quantity-display {
+            font-weight: 700;
+            color: #222;
+            min-width: 24px;
+            text-align: center;
+            font-size: 1em;
+        }
+        #not-found {
+            color: #c0392b;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 20px;
+            min-height: 20px;
+            width: 100%;
+            max-width: 980px;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>SEPETİGO</h1>
+    <div id="container">
+        <div id="last-scanned">
+            <h2>Son Okutulan Ürün</h2>
+            <img id="product-image" src="" alt="Ürün Fotoğrafı" style="display:none;">
+            <div id="product-name"></div>
+        </div>
+
+        <div id="video-container"></div>
+
+        <div id="products-list">
+            <h2>Sepetiniz</h2>
+            <ul id="product-items">
+                <!-- Buraya okutulan ürünler listelenecek -->
+            </ul>
+        </div>
+    </div>
+
+    <div id="not-found"></div>
+
+   <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const lastScannedImage = document.getElementById('product-image');
+    const lastScannedName = document.getElementById('product-name');
+    const notFoundEl = document.getElementById('not-found');
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Tarayıcınız kamera erişimini desteklemiyor.");
+        return;
+    }
+
+    const lastScanTimes = {};
+    const productCounts = {};
+    const productNames = {};
+
+    function updateProductList() {
+        const ul = document.getElementById('product-items');
+        ul.innerHTML = '';
+
+        for(const code in productCounts){
+            const li = document.createElement('li');
+
+            // Ürün adı ve adet göstergesi div
+            const topRow = document.createElement('div');
+            topRow.style.display = 'flex';
+            topRow.style.alignItems = 'center';
+            topRow.style.justifyContent = 'space-between';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = productNames[code] || "Bilinmeyen Ürün";
+            nameSpan.style.fontWeight = '600';
+
+            topRow.appendChild(nameSpan);
+
+            if(productCounts[code] > 1){
+                const countBadge = document.createElement('span');
+                countBadge.className = 'count-badge';
+                countBadge.textContent = productCounts[code] + 'x';
+                topRow.appendChild(countBadge);
+            }
+
+            li.appendChild(topRow);
+
+            // Quantity controls (adet arttır/azalt)
+            const controls = document.createElement('div');
+            controls.className = 'quantity-controls';
+
+            const minusBtn = document.createElement('button');
+            minusBtn.textContent = '-';
+
+            const countDisplay = document.createElement('span');
+            countDisplay.className = 'quantity-display';
+            countDisplay.textContent = productCounts[code];
+
+            const plusBtn = document.createElement('button');
+            plusBtn.textContent = '+';
+
+            // Artı-eksi butonlarına backend çağrısı ekle
+            minusBtn.addEventListener('click', () => {
+    if (productCounts[code] > 1) {
+        productCounts[code]--;
+        countDisplay.textContent = productCounts[code];
+    } else {
+        // Eğer 1 ise ve eksiye basıldıysa ürün silinecek
+        delete productCounts[code];
+        delete productNames[code];
+    }
+    updateProductList();
+});
+
+            plusBtn.addEventListener('click', () => {
+                updateQuantity(code, 'increase');
+            });
+
+            controls.appendChild(minusBtn);
+            controls.appendChild(countDisplay);
+            controls.appendChild(plusBtn);
+
+            li.appendChild(controls);
+
+            ul.appendChild(li);
+        }
+    }
+
+    function updateQuantity(barcode, action) {
+        fetch('/update_product_quantity/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({barcode: barcode, action: action})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.quantity !== undefined){
+                productCounts[barcode] = data.quantity;
+                updateProductList();
+            }
+        })
+        .catch(err => {
+            console.error('Miktar güncelleme hatası:', err);
+        });
+    }
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#video-container'),
+            constraints: {
+                facingMode: "environment"
+            }
+        },
+        decoder: {
+            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "upc_reader"]
+        }
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            alert("Quagga başlatılamadı.");
+            return;
+        }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(function(result) {
+        const code = result.codeResult.code;
+        const now = Date.now();
+
+        if(lastScanTimes[code] && (now - lastScanTimes[code]) < 3000){
+            return;
+        }
+
+        lastScanTimes[code] = now;
+
+        fetch('/check_barcode/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({barcode: code})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.product_name && data.product_name !== "Ürün bulunamadı" && data.product_name !== "Ürün dosyası bulunamadı"){
+                productNames[code] = data.product_name;
+
+                if(productCounts[code]){
+                    productCounts[code]++;
+                } else {
+                    productCounts[code] = 1;
+                }
+
+                lastScannedName.textContent = data.product_name;
+                lastScannedImage.src = data.product_image;
+                lastScannedImage.style.display = 'block';
+
+                updateProductList();
+                notFoundEl.textContent = '';
+            } else {
+                notFoundEl.textContent = "Ürün bulunamadı: " + code;
+                lastScannedName.textContent = '';
+                lastScannedImage.style.display = 'none';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+        });
+    });
+});
+</script>
+</body>
+</html>
