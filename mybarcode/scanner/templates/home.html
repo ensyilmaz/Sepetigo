@@ -222,11 +222,11 @@
 
     <div id="not-found"></div>
 
-   <script>
-document.addEventListener("DOMContentLoaded", function() {
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
     const lastScannedImage = document.getElementById('product-image');
-    const lastScannedName = document.getElementById('product-name');
-    const notFoundEl = document.getElementById('not-found');
+    const lastScannedName  = document.getElementById('product-name');
+    const notFoundEl       = document.getElementById('not-found');
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert("Tarayıcınız kamera erişimini desteklemiyor.");
@@ -235,16 +235,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const lastScanTimes = {};
     const productCounts = {};
-    const productNames = {};
+    const productNames  = {};
 
     function updateProductList() {
         const ul = document.getElementById('product-items');
         ul.innerHTML = '';
 
-        for(const code in productCounts){
+        for (const code in productCounts) {
             const li = document.createElement('li');
 
-            // Ürün adı ve adet göstergesi div
             const topRow = document.createElement('div');
             topRow.style.display = 'flex';
             topRow.style.alignItems = 'center';
@@ -253,10 +252,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const nameSpan = document.createElement('span');
             nameSpan.textContent = productNames[code] || "Bilinmeyen Ürün";
             nameSpan.style.fontWeight = '600';
-
             topRow.appendChild(nameSpan);
 
-            if(productCounts[code] > 1){
+            if (productCounts[code] > 1) {
                 const countBadge = document.createElement('span');
                 countBadge.className = 'count-badge';
                 countBadge.textContent = productCounts[code] + 'x';
@@ -265,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             li.appendChild(topRow);
 
-            // Quantity controls (adet arttır/azalt)
             const controls = document.createElement('div');
             controls.className = 'quantity-controls';
 
@@ -279,13 +276,11 @@ document.addEventListener("DOMContentLoaded", function() {
             const plusBtn = document.createElement('button');
             plusBtn.textContent = '+';
 
-            // Artı-eksi butonlarına backend çağrısı ekle
             minusBtn.addEventListener('click', () => {
                 if (productCounts[code] > 1) {
                     productCounts[code]--;
                     countDisplay.textContent = productCounts[code];
                 } else {
-                    // Eğer 1 ise ve eksiye basıldıysa ürün silinecek
                     delete productCounts[code];
                     delete productNames[code];
                 }
@@ -301,7 +296,6 @@ document.addEventListener("DOMContentLoaded", function() {
             controls.appendChild(plusBtn);
 
             li.appendChild(controls);
-
             ul.appendChild(li);
         }
     }
@@ -309,19 +303,17 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateQuantity(barcode, action) {
         fetch('/update_product_quantity/', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({barcode: barcode, action: action})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ barcode, action })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            if(data.quantity !== undefined){
+            if (data.quantity !== undefined) {
                 productCounts[barcode] = data.quantity;
                 updateProductList();
             }
         })
-        .catch(err => {
-            console.error('Miktar güncelleme hatası:', err);
-        });
+        .catch(err => console.error('Miktar güncelleme hatası:', err));
     }
 
     Quagga.init({
@@ -329,14 +321,12 @@ document.addEventListener("DOMContentLoaded", function() {
             name: "Live",
             type: "LiveStream",
             target: document.querySelector('#video-container'),
-            constraints: {
-                facingMode: "environment"
-            }
+            constraints: { facingMode: "environment" }
         },
         decoder: {
             readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "upc_reader"]
         }
-    }, function(err) {
+    }, function (err) {
         if (err) {
             console.error(err);
             alert("Quagga başlatılamadı.");
@@ -345,49 +335,52 @@ document.addEventListener("DOMContentLoaded", function() {
         Quagga.start();
     });
 
-    Quagga.onDetected(function(result) {
-        const code = result.codeResult.code;
-        const now = Date.now();
+    Quagga.onDetected(function (result) {
+        const code = result?.codeResult?.code;
+        if (!code) return;
 
-        if(lastScanTimes[code] && (now - lastScanTimes[code]) < 3000){
+        const now = Date.now();
+        if (lastScanTimes[code] && (now - lastScanTimes[code]) < 3000) {
             return;
         }
-
         lastScanTimes[code] = now;
 
         fetch('/check_barcode/', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({barcode: code})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ barcode: code })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            if(data.product_name && data.product_name !== "Ürün bulunamadı" && data.product_name !== "Ürün dosyası bulunamadı"){
+            if (data.product_name && data.product_name !== "Ürün bulunamadı" && data.product_name !== "Ürün dosyası bulunamadı") {
                 productNames[code] = data.product_name;
 
-                if(productCounts[code]){
+                if (productCounts[code]) {
                     productCounts[code]++;
                 } else {
                     productCounts[code] = 1;
                 }
 
                 lastScannedName.textContent = data.product_name;
-                lastScannedImage.src = data.product_image;
-                lastScannedImage.style.display = 'block';
+
+                // ✅ SADECE geçerli ürün bulunduğunda resmi güncelle
+                if (data.product_image) {
+                    lastScannedImage.src = data.product_image;
+                    lastScannedImage.style.display = 'block';
+                }
 
                 updateProductList();
                 notFoundEl.textContent = '';
             } else {
+                // ✅ Ürün bulunamadıysa mevcut son fotoğrafı KORU
                 notFoundEl.textContent = "Ürün bulunamadı: " + code;
-                lastScannedName.textContent = '';
-                lastScannedImage.style.display = 'none';
+                // lastScannedName ve lastScannedImage'a dokunmuyoruz
             }
         })
         .catch(err => {
             console.error(err);
+            // notFoundEl.textContent = "Bir hata oluştu.";
         });
     });
 });
 </script>
-</body>
-</html>
