@@ -197,9 +197,14 @@
         
         /* === Mobil uyumluluk (≤768px) === */
 @media (max-width: 768px) {
-  /* Genel: daha sıkı boşluklar, akışkan başlık boyutu */
-  body { padding: 12px; }
-  h1 { font-size: clamp(1.25rem, 6vw, 1.8rem); margin-bottom: 12px; }
+  #container {
+    flex-direction: column;
+  }
+
+  /* Sıralamayı değiştiriyoruz */
+  #video-container   { order: 1; }
+  #last-scanned      { order: 2; }
+  #products-list     { order: 3; }
 
   /* İki kolon yerine tek kolon */
   #container {
