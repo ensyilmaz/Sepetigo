@@ -1,87 +1,97 @@
-import os
 import json
+from pathlib import Path
+from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.templatetags.static import static
+from django.conf import settings
 
-def home(request):
-    return render(request, 'scanner/home.html')
+APP_DIR = Path(__file__).resolve().parent
+PRODUCTS_FILE = APP_DIR / "products.txt"
+_PRODUCT_CACHE = None
 
-def get_products_dict():
-    products_file = os.path.join(os.path.dirname(__file__), 'products.txt')
-    products = {}
+
+def _load_products():
+    """products.txt dosyasını (BARCODE=NAME) formatında yükler."""
+    global _PRODUCT_CACHE
+    if _PRODUCT_CACHE is not None:
+        return _PRODUCT_CACHE
+
+    mapping = {}
+    if PRODUCTS_FILE.exists():
+        with open(PRODUCTS_FILE, "r", encoding="utf-8") as f:
+            for raw in f:
+                line = raw.strip()
+                if not line or "=" not in line:
+                    continue
+                parts = line.split("=")
+                barcode = parts[0].strip()
+                name = parts[1].strip() if len(parts) > 1 else ""
+                if barcode:
+                    mapping[barcode] = {"name": name}
+    _PRODUCT_CACHE = mapping
+    return mapping
+
+
+def home(request: HttpRequest) -> HttpResponse:
+    cart = request.session.get("cart", {})
+    context = {"cart": cart}
+    return render(request, "home.html", context)
+
+
+@csrf_exempt
+def check_barcode(request: HttpRequest) -> JsonResponse:
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
     try:
-        with open(products_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if '=' in line:
-                    parts = line.split('=')
-                    if len(parts) == 3:
-                        bcode, name, image_folder = parts
-                    elif len(parts) == 2:
-                        bcode, name = parts
-                        image_folder = 'images'  # default folder
-                    else:
-                        continue
-                    products[bcode] = {
-                        'name': name,
-                        'image_folder': image_folder,
-                    }
-    except FileNotFoundError:
-        print("products.txt bulunamadı!")
-    return products
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        payload = {}
 
-@csrf_exempt
-def check_barcode(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        barcode = data.get('barcode')
+    barcode = str(payload.get("barcode", "")).strip()
+    products = _load_products()
+    info = products.get(barcode)
 
-        products = get_products_dict()
-        product = products.get(barcode)
-
-        if product:
-            image_url = f"/static/{product['image_folder']}/{barcode}.jpg"
-            scanned_products = request.session.get('scanned_products', [])
-            if barcode not in scanned_products:
-                scanned_products.append(barcode)
-                request.session['scanned_products'] = scanned_products
-                request.session.modified = True
-
-            return JsonResponse({
-                "product_name": product['name'],
-                "product_image": image_url,
-                "scanned_products": scanned_products,
-            })
-        else:
-            return JsonResponse({
-                "product_name": "Ürün bulunamadı",
-            })
-    return JsonResponse({"error": "Invalid method"}, status=405)
-
-@csrf_exempt
-def update_product_quantity(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        barcode = data.get('barcode')
-        action = data.get('action')  # 'increase' veya 'decrease'
-
-        cart = request.session.get('cart', {})
-
-        if barcode not in cart:
-            if action == 'increase':
-                cart[barcode] = 1
-        else:
-            if action == 'increase':
-                cart[barcode] += 1
-            elif action == 'decrease':
-                cart[barcode] = max(1, cart[barcode] - 1)
-
-        request.session['cart'] = cart
-        request.session.modified = True
-
+    if not info:
         return JsonResponse({
-            "barcode": barcode,
-            "quantity": cart.get(barcode, 0)
+            "product_name": "Ürün bulunamadı",
+            "product_image": static("images/placeholder.png"),
+            "barcode": barcode
         })
-    return JsonResponse({"error": "Invalid method"}, status=405)
+
+    # görseli doğrudan barkod.jpg olarak veriyoruz
+    img_url = static(f"images/{barcode}.jpg")
+
+    return JsonResponse({
+        "product_name": info["name"],
+        "product_image": img_url,
+        "barcode": barcode
+    })
+
+
+@csrf_exempt
+def update_product_quantity(request: HttpRequest) -> JsonResponse:
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        payload = {}
+
+    barcode = str(payload.get("barcode", "")).strip()
+    action = payload.get("action", "increase")
+    cart = request.session.get("cart", {})
+
+    if action == "increase":
+        cart[barcode] = int(cart.get(barcode, 0)) + 1
+    elif action == "decrease":
+        qty = int(cart.get(barcode, 0)) - 1
+        if qty > 0:
+            cart[barcode] = qty
+        else:
+            cart.pop(barcode, None)
+
+    request.session["cart"] = cart
+    return JsonResponse({"quantity": cart.get(barcode, 0)})

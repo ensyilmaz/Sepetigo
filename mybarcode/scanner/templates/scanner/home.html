@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title> SEPETİGO | Hoş Geldiniz </title>
+    {% load static %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         /* Stil aynen kalsın */
@@ -200,7 +201,10 @@
     <div id="container">
         <div id="last-scanned">
             <h2>Son Okutulan Ürün</h2>
-            <img id="product-image" src="" alt="Ürün Fotoğrafı" style="display:none;">
+            <img id="product-image" 
+     src="{% static 'images/placeholder.png' %}" 
+     alt="Ürün Fotoğrafı" 
+     style="display:none;">
             <div id="product-name"></div>
         </div>
 
