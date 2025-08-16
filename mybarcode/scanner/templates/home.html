@@ -428,47 +428,47 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     Quagga.onDetected(function(result) {
-        const code = result.codeResult.code;
-        const now = Date.now();
+    const code = result.codeResult.code;
+    const now = Date.now();
 
-        if(lastScanTimes[code] && (now - lastScanTimes[code]) < 3000){
-            return;
-        }
+    if(lastScanTimes[code] && (now - lastScanTimes[code]) < 3000){
+        return;
+    }
 
-        lastScanTimes[code] = now;
+    lastScanTimes[code] = now;
 
-        fetch('/check_barcode/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({barcode: code})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.product_name && data.product_name !== "Ürün bulunamadı" && data.product_name !== "Ürün dosyası bulunamadı"){
-                productNames[code] = data.product_name;
+    fetch('/check_barcode/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({barcode: code})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.product_name && data.product_name !== "Ürün bulunamadı" && data.product_name !== "Ürün dosyası bulunamadı"){
+            productNames[code] = data.product_name;
 
-                if(productCounts[code]){
-                    productCounts[code]++;
-                } else {
-                    productCounts[code] = 1;
-                }
-
-                lastScannedName.textContent = data.product_name;
-                lastScannedImage.src = data.product_image;
-                lastScannedImage.style.display = 'block';
-
-                updateProductList();
-                notFoundEl.textContent = '';
+            if(productCounts[code]){
+                productCounts[code]++;
             } else {
-                notFoundEl.textContent = "Ürün bulunamadı: " + code;
-                lastScannedName.textContent = '';
-                lastScannedImage.style.display = 'none';
+                productCounts[code] = 1;
             }
-        })
-        .catch(err => {
-            console.error(err);
-        });
+
+            lastScannedName.textContent = data.product_name;
+            lastScannedImage.src = data.product_image;
+            lastScannedImage.style.display = 'block';
+
+            updateProductList();
+            notFoundEl.textContent = '';
+        } else {
+            // ✅ ürün bulunamadığında mevcut fotoğraf/görsel korunuyor
+            notFoundEl.textContent = "Ürün bulunamadı: " + code;
+            // lastScannedName ve lastScannedImage'a dokunmuyoruz
+        }
+    })
+    .catch(err => {
+        console.error(err);
     });
+});
 });
 </script>
 </body>
