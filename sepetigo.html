@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sepetigo – Hızlı Alışverişin Son Hali</title>
+  <meta name="description" content="Sepetigo: Kamera tabanlı otomatik ürün tanıma ve ödeme ile kasasız, temassız, hızlı alışveriş deneyimi. Marketler için SaaS + komisyon tabanlı çözüm." />
+  <meta property="og:title" content="Sepetigo – Hızlı Alışverişin Son Hali" />
+  <meta property="og:description" content="Kamerayla tanı, barkodsuz ekle, saniyeler içinde öde. Marketler için modüler SaaS altyapısı." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sepetigo.com.tr" />
+  <meta name="theme-color" content="#10305a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* Light palette */
+      --navy:#0b1b3a;          /* lacivert */
+      --green:#2eb67d;         /* yeşil */
+      --cream:#faf8f0;         /* krem */
+      --white:#ffffff;         /* beyaz */
+      --ink:#1f2a44;           /* koyu metin */
+      --muted:#5b6275;         /* ikincil metin */
+      --line:rgba(11,27,58,.12);
+
+      --bg:linear-gradient(180deg,#fbfaf5 0%, #f6f8ff 100%);
+      --panel:var(--white);
+      --glass:rgba(255,255,255,.75);
+      --text:var(--ink);
+
+      --primary:var(--navy);
+      --accent:var(--green);
+
+      --header-h:72px;
+      --container-w:1120px;
+      --container-p:4%;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; color:var(--text); background:var(--bg);
+      font-family:'Plus Jakarta Sans', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      padding-top:var(--header-h);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{width:min(var(--container-w), 100% - 2*var(--container-p)); margin-inline:auto}
+
+    /* HEADER / NAV */
+    header{
+      position:fixed; inset:0 0 auto 0; height:var(--header-h); z-index:1000; width:100%;
+      display:flex; align-items:center;
+      background:rgba(255,255,255,.9); backdrop-filter:saturate(1.2) blur(8px);
+      border-bottom:1px solid var(--line);
+      box-shadow:0 6px 16px rgba(11,27,58,.06);
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.3px; color:var(--primary)}
+    .logo{width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, var(--primary), var(--accent)); box-shadow:0 6px 14px rgba(16,48,90,.25)}
+    nav ul{display:flex; gap:10px; list-style:none; padding:0; margin:0}
+    nav a{padding:10px 12px; border-radius:10px; font-weight:700; color:var(--muted); white-space:nowrap}
+    nav a:hover{color:var(--primary); background:rgba(16,48,90,.08)}
+    nav a.active{color:var(--white); background:linear-gradient(90deg,var(--primary),#1f3b73); box-shadow:0 0 0 1px rgba(16,48,90,.25) inset}
+    .cta{display:inline-flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; font-weight:800; white-space:nowrap; border:1px solid rgba(16,48,90,.1);
+      background:linear-gradient(90deg, var(--primary), #1f3b73); color:#fff; box-shadow:0 10px 22px rgba(16,48,90,.25)}
+    .cta:hover{transform:translateY(-1px)}
+    /* mobile */
+    .hamburger{display:none}
+    .mobile-nav{display:none; padding:8px 0 16px}
+
+    /* HERO */
+    .hero{position:relative; padding:48px 0 60px}
+    .grid-2{display:grid; grid-template-columns:1.15fr .85fr; gap:38px; align-items:center}
+    .title{font-size:clamp(34px, 4.4vw, 58px); line-height:1.06; letter-spacing:-.3px; font-weight:800; color:var(--primary)}
+    .subtitle{font-size:clamp(16px, 2.1vw, 20px); color:var(--muted)}
+    .badges{display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 26px}
+    .badge{border:1px solid var(--line); background:#f5f8ff; padding:8px 12px; border-radius:999px; font-weight:700; font-size:13px; color:var(--primary)}
+    .hero-card{position:relative; background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:18px; overflow:hidden; box-shadow:0 10px 24px rgba(11,27,58,.08)}
+    /* Smaller beta preview */
+    .phone{aspect-ratio:9/19; width:min(260px, 86%); border-radius:26px; border:1px solid rgba(11,27,58,.12); margin:14px auto; position:relative; overflow:hidden;
+      /* iPhone benzeri çerçeve */
+      background: linear-gradient(160deg,#e8edf6,#d9e2ef);
+      padding:10px;
+      box-shadow: 0 8px 26px rgba(11,27,58,.12);
+    }
+    /* iPhone ekranı (beyaz) */
+    .phone .screen{
+      position:relative; width:100%; height:100%;
+      background:#ffffff; border-radius:20px; overflow:hidden;
+    }
+    /* iPhone notch */
+    .phone .notch{
+      position:absolute; top:8px; left:50%; transform:translateX(-50%);
+      width:34%; height:18px; background:#0f1117; border-radius:14px;
+      box-shadow:0 2px 6px rgba(0,0,0,.15) inset;
+    }
+    /* Uygulama başlığı */
+    .phone .app-title{
+      margin-top:36px; text-align:center; font-weight:900; letter-spacing:.5px; font-size:14px; color:#000;
+    }
+    .phone .app-title .go{ color: var(--accent); }
+    /* Barkod okuyucu görseli */
+    .phone .barcode-box{
+      margin:10px 14px 12px; height:74px; border:1px dashed var(--line); border-radius:12px;
+      background:#f7fafc; position:relative; overflow:hidden; display:grid; place-items:center;
+    }
+    .phone .barcode-stripes{
+      position:absolute; inset:10px 14px;
+      background: repeating-linear-gradient(90deg,#1f2a44 0 2px, transparent 2px 6px);
+      opacity:.12; border-radius:8px;
+    }
+    .phone .barcode-laser{
+      position:absolute; top:50%; left:-30%; width:60%; height:2px; background:#ff3b30;
+      box-shadow:0 0 10px rgba(255,59,48,.6); animation:laser 2.2s linear infinite;
+    }
+    @keyframes laser{ 0%{transform:translateX(0)} 100%{transform:translateX(260%)} }
+
+    .product{position:absolute; inset:auto 8% 12% 8%; display:grid; gap:8px; place-items:center}
+    .card{width:100%; background:#f7faff; border:1px solid var(--line); border-radius:14px; padding:10px; color:var(--ink)}
+    .price{display:flex; align-items:center; justify-content:space-between; font-weight:800}
+
+    /* SECTIONS */
+    section{padding:80px 0; scroll-margin-top:calc(var(--header-h) + 14px)}
+    .section-title{font-size:28px; font-weight:800; margin:0 0 12px; color:var(--primary)}
+    .section-lead{color:var(--muted); margin:0 0 26px}
+    .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .cardX{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 6px 16px rgba(11,27,58,.06)}
+    .cardX h3{margin:6px 0 6px; font-size:18px; color:var(--primary)}
+    .chip{display:inline-block; font-weight:700; font-size:12px; letter-spacing:.3px; color:#0b1b3a; background:linear-gradient(90deg, #d9f6e9, #f3fff9); padding:6px 10px; border-radius:999px; border:1px solid rgba(11,27,58,.08)}
+
+    /* FEATURES */
+    .features{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+    .feature{display:flex; gap:14px; padding:18px; background:var(--panel); border:1px solid var(--line); border-radius:14px}
+    .ico{width:32px; height:32px; flex:0 0 32px; border-radius:10px; background:linear-gradient(180deg, var(--accent), #53e3a5); box-shadow:0 6px 16px rgba(46,182,125,.25)}
+
+    /* TIMELINE */
+    .timeline{position:relative; padding:8px; border-radius:16px; background:var(--panel); border:1px solid var(--line); box-shadow:0 6px 16px rgba(11,27,58,.05)}
+    .tl-grid{display:grid; grid-template-columns:repeat(9, minmax(160px,1fr)); gap:14px; overflow:auto; padding-bottom:8px}
+    .mile{background:#f7fafc; border:1px solid var(--line); border-radius:14px; padding:14px}
+    .mile span{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+
+    /* FOOTER */
+    footer{padding:40px 0 60px; color:var(--muted); background:#fff; border-top:1px solid var(--line)}
+    .footer-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:20px}
+    .socials{display:flex; gap:10px}
+    .socials a{padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:#f7f9ff}
+
+    /* reveal */
+    .reveal{opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease}
+    .reveal.on{opacity:1; transform:none}
+
+    /* responsive */
+    @media (max-width: 1100px){
+      nav ul{gap:6px}
+      nav a{padding:8px 10px}
+    }
+    @media (max-width: 980px){
+      .grid-2{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr 1fr}
+      .features{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr}
+      nav ul{display:none}
+      .hamburger{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:#f7f9ff; color:var(--primary)}
+      .mobile-nav{display:none; padding:8px 0 16px}
+      .mobile-nav a{display:block; padding:12px 12px; border-radius:12px; color:var(--muted)}
+      .mobile-nav a:hover{background:rgba(16,48,90,.06); color:var(--primary)}
+    }
+    @media (min-width: 981px){
+      #mobileNav{display:none !important}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="#home" class="brand">
+  <span class="logo" aria-hidden>
+    <img src="images/logo-basket.png" alt="Sepetigo Logo" style="width:100%;height:100%;object-fit:contain;">
+  </span>
+  <span>Sepetigo</span>
+</a>
+      <nav aria-label="Ana menü">
+        <button class="hamburger" aria-label="Menüyü Aç/Kapat" id="menuBtn">≡</button>
+        <ul id="navList">
+          <li><a href="#about">Hakkımızda</a></li>
+          <li><a href="#vision">Vizyon & Misyon</a></li>
+          <li><a href="#why">Neden Biz?</a></li>
+          <li><a href="#tech">İş Modeli & Teknoloji</a></li>
+          <li><a href="#timeline">Yol Haritası</a></li>
+          <li><a href="#contact">İletişim</a></li>
+        </ul>
+      </nav>
+      <a class="cta" href="#contact">Demo Talep Et →</a>
+    </div>
+    <div class="container mobile-nav" id="mobileNav" aria-label="Mobil menü" style="display:none">
+      <a href="#about">Hakkımızda</a>
+      <a href="#vision">Vizyon & Misyon</a>
+      <a href="#team">Ekibimiz</a>
+      <a href="#why">Neden Biz?</a>
+      <a href="#tech">İş Modeli & Teknoloji</a>
+      <a href="#timeline">Yol Haritası</a>
+      <a href="#contact">İletişim</a>
+    </div>
+  </header>
+
+  <main id="home" class="hero container">
+    <div class="grid-2">
+      <div>
+        <div class="badges">
+          <span class="badge">Kamera ile Ürün Tanıma</span>
+          <span class="badge">Kasasız Alışveriş</span>
+          <span class="badge">SaaS + Komisyon Modeli</span>
+        </div>
+        <h1 style="
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 900;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+">
+  <span style="color:#000;">SEPETİ</span><span style="color:#2eb67d;">GO</span>
+</h1>
+
+        <h1 class="title">Hızlı Alışverişin <span style="background:linear-gradient(90deg,var(--accent),#9be8c5); -webkit-background-clip:text; background-clip:text; color:transparent">Son Hali</span></h1>
+        <p class="subtitle">Kamerayı ürüne çevir, otomatik tanı ve sepete ekle. İyzico güvencesiyle saniyeler içinde öde. Kasa yok, sıra yok, bekleme yok.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px">
+          <a class="cta" href="#contact">Pilot Market Başvurusu</a>
+          <a class="cta" style="background:#fff; color:var(--primary); border:1px solid var(--line); box-shadow:0 2px 8px rgba(11,27,58,.08)" href="#tech">Nasıl Çalışır?</a>
+        </div>
+      </div>
+      <div class="hero-card reveal">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <strong style="color:var(--primary)">Sepetigo • Beta Önizleme</strong>
+          <span class="chip" style="background:linear-gradient(90deg,#d2f7e7,#f2fff8)">Beta</span>
+        </div>
+        <!-- YENİ TELEFON ÖNİZLEME -->
+        <div class="phone" aria-label="Mobil Uygulama Önizleme">
+          <div class="screen">
+            <div class="notch"></div>
+
+            <!-- Uygulama başlığı -->
+            <div class="app-title">SEPETİ<span class="go">GO</span></div>
+
+            <!-- Barkod okuyucu görsel alanı -->
+            <div class="barcode-box" aria-hidden="true">
+              <div class="barcode-stripes"></div>
+              <div class="barcode-laser"></div>
+            </div>
+
+            <!-- Mevcut ürün önizlemesi (değiştirmedim) -->
+            <div class="product">
+              <div class="card">
+                <div style="display:flex; align-items:center; gap:12px">
+                  <div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(180deg, var(--primary), #1f3b73);"></div>
+                  <div style="flex:1">
+                    <div style="font-weight:800">Süt 1L</div>
+                    <div style="color:#5b6275; font-size:12px">Otomatik tanındı • Sepete eklendi</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card price">
+                <span>Ara Toplam</span>
+                <span>₺ 64,90</span>
+              </div>
+              <a class="cta" style="justify-content:center" href="#contact">Ödemeye Geç</a>
+            </div>
+          </div>
+        </div>
+        <!-- /YENİ TELEFON ÖNİZLEME -->
+        <div style="display:flex; gap:10px; align-items:center; color:var(--muted)">
+          <span style="width:8px; height:8px; border-radius:50%; background:var(--accent)"></span>
+          Gerçek zamanlı tanıma aktif
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title">Hakkımızda</h2>
+      <p class="section-lead">Sepetigo, kasasız ve temassız alışveriş deneyimini herkes için erişilebilir kılmayı hedefleyen yenilikçi bir perakende teknolojisidir. Kamera tabanlı yapay zekâ tanıma sistemi sayesinde müşteriler, herhangi bir barkod okuma ya da manuel ürün ekleme süreci olmadan yalnızca kamerayı ürüne yönelterek alışverişini tamamlar. Uygulama, ürünü anında tanır, sepete ekler ve toplam tutarı otomatik olarak günceller. Ardından kullanıcı, İyzico altyapısı üzerinden güvenli bir şekilde ödemesini gerçekleştirir ve dijital fişini alarak kasaya uğramadan çıkış yapabilir.</p>
+      <div class="cards">
+        <div class="cardX reveal">
+          <span class="chip">Amaç</span>
+          <h3>Temassız & Hızlı Deneyim</h3>
+          <p>Amacımız, müşterinin “bekleme” deneyimini sıfıra indirmek ve mağaza içi akışı yalınlaştırmaktır. Sepetigo; ürün tanıma, sepete ekleme ve ödeme adımlarını tek akışta birleştirerek, self-checkout sistemlerinin kurulum ve eğitim yükünü işletmelerden alır. Bu sayede personel, katma değerli görevlere odaklanır; mağaza dönüş hızı artar, ciro kaybı ve terk oranı azalır.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Model</span>
+          <h3>SaaS + Komisyon</h3>
+          <p>Gelir modelimiz, aylık abonelik ve düşük oranlı işlem komisyonundan oluşur. SaaS yaklaşımı, yeni özellikleri tüm müşterilere eş-zamanlı sunmamıza ve bakım giderlerini öngörülebilir şekilde yönetmemize imkân verir. Kullanım hacmine göre esneyen paketler ile küçük marketlerden zincirlere kadar ölçeklenebilir bir çözüm sunuyoruz.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Güvenlik</span>
+          <h3>PCI DSS Uyumlu</h3>
+          <p>Ödeme süreçleri İyzico üzerinde, PCI DSS standartlarına uygun şekilde yürütülür. Kart verileri Sepetigo sistemlerinde tutulmaz; yetkilendirme ve saklama işlemleri sertifikalı sağlayıcı üzerinde yapılır. KVKK kapsamındaki kişisel veriler için aydınlatma ve açık rıza metinleriyle şeffaf bir çerçeve izler, veri minimizasyonu prensibine bağlı kalırız.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vision">
+    <div class="container">
+      <h2 class="section-title">Vizyon & Misyon</h2>
+      <div class="features">
+        <div class="feature reveal">
+          <div class="ico"></div>
+          <div>
+            <h3>Vizyon</h3>
+            <p>Perakendeyi insan müdahalesine en az ihtiyaç duyan, otomatik ve sezgisel sistemlerle dönüştürmek; kasasız mağazacılıkta standart belirlemek.</p>
+          </div>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"></div>
+          <div>
+            <h3>Misyon</h3>
+            <p>Self-checkout teknolojisini pahalı ve karmaşık donanımlardan kurtararak kamerayla tanıma + SaaS altyapısını birleştiren ölçeklenebilir bir çözüm sunmak.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="container">
+      <h2 class="section-title">Ekibimiz</h2>
+      <p class="section-lead">Teknoloji, tasarım ve operasyon disiplinlerini birleştiren çekirdek ekibimizle perakendeyi yeniden tasarlıyoruz.</p>
+      <div class="cards">
+        <div class="cardX reveal">
+          <h3>Enes Yılmaz</h3>
+          <p>Business Development Manager</p>
+        </div>
+        <div class="cardX reveal">
+          <h3>Ahmet Can Çöl</h3>
+          <p>PCB & Electronic Manager</p>
+        </div>
+        <div class="cardX reveal">
+          <h3>Serhat Emin Altay</h3>
+          <p>Software & Technic Manager</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="container">
+      <h2 class="section-title">Neden Biz?</h2>
+      <div class="features">
+        <div class="feature reveal"><div class="ico"></div><div><h3>Sadece Telefon</h3><p>Barkod, ekran dokunuşu veya manuel giriş olmadan; yalnızca kamerayı ürüne çevirmeniz yeterli.</p></div></div>
+        <div class="feature reveal"><div class="ico"></div><div><h3>Modüler SaaS</h3><p>Bulut tabanlı altyapı ile düşük donanım maliyeti ve API üzerinden kolay entegrasyon.</p></div></div>
+        <div class="feature reveal"><div class="ico"></div><div><h3>Hızlı & Güvenli Ödeme</h3><p>İyzico iş birliği sayesinde kayıtlı kartla saniyeler içinde ödeme; süreçler şeffaf ve güvenli.</p></div></div>
+        <div class="feature reveal"><div class="ico"></div><div><h3>Maliyet Azaltır</h3><p>Kasa kuyruklarını ve alan maliyetini düşürür; personel verimliliğini artırır.</p></div></div>
+        <div class="feature reveal"><div class="ico"></div><div><h3>Geleceğe Hazır</h3><p>Öğrenen yapay zekâ, farklı sağlayıcılara adaptasyon ve sürekli gelişen platform.</p></div></div>
+        <div class="feature reveal"><div class="ico"></div><div><h3>Bulut Güvencesi</h3><p>Veritabanı yönetimi ve operasyonlar merkezi bulut üzerinden yönetilir.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tech">
+    <div class="container">
+      <h2 class="section-title">İş Modeli & Teknoloji</h2>
+      <p class="section-lead">Kamera tabanlı ürün tanıma • Bulut tabanlı modüler mimari • İyzico ile PCI DSS uyumlu ödeme</p>
+      <div class="cards">
+        <div class="cardX reveal">
+          <span class="chip">Tanıma</span>
+          <h3>Kamerayla Ürün Tanıma</h3>
+          <p>Kullanıcı yalnızca kamerayı ürüne yöneltir; sistem otomatik tanır ve sepete ekler. Barkod okuma veya dokunma zorunluluğu yok.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Mimari</span>
+          <h3>Bulut & API</h3>
+          <p>Pazar yeri/market altyapısından bağımsız API'lerle hızlı entegrasyon. Her işletme kendi ürün veritabanını dahil edebilir.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Ödeme</span>
+          <h3>İyzico Güvencesi</h3>
+          <p>PCI DSS standartlarına uygun ödeme akışları. Kart saklama ve hızlı ödeme deneyimi.</p>
+        </div>
+      </div>
+      <div class="cards" style="margin-top:18px">
+        <div class="cardX reveal">
+          <span class="chip">Gelir</span>
+          <h3>Abonelik + %0.4 Komisyon</h3>
+          <p>İşlemlerden düşük oranlı komisyon ve bakım hizmetleri ile ölçeklenebilir, öngörülebilir gelir.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Entegrasyon</span>
+          <h3>Ödeme & Barkod</h3>
+          <p>İyzico ve barkod/veritabanı entegrasyonları ile uçtan uca akış.</p>
+        </div>
+        <div class="cardX reveal">
+          <span class="chip">Pilot</span>
+          <h3>MVP & İyileştirme</h3>
+          <p>Seçili marketlerde MVP testi, geri bildirim toplama ve hız/güvenlik optimizasyonları.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="timeline">
+    <div class="container">
+      <h2 class="section-title">Yol Haritası</h2>
+      <p class="section-lead">Kasım 2025 – Mayıs 2027 arasında planlanan araştırma, tasarım, entegrasyon, pilot ve büyüme adımları.</p>
+      <div class="timeline reveal">
+        <div class="tl-grid">
+          <div class="mile"><span>Kasım 2025</span><strong>Araştırma</strong><p>Self-checkout ve kuyruk sorunlarının analizi.</p></div>
+          <div class="mile"><span>Ocak 2026</span><strong>Tasarım</strong><p>Sepet sensörü ve mobil mimari planı.</p></div>
+          <div class="mile"><span>Mart 2026</span><strong>Arayüz</strong><p>Basit & sezgisel UX/UI.</p></div>
+          <div class="mile"><span>Mayıs 2026</span><strong>Prototip</strong><p>Kamera tanıma + ağırlık eşleştirme testi.</p></div>
+          <div class="mile"><span>Temmuz 2026</span><strong>Entegrasyon</strong><p>İyzico ve barkod veritabanları bağlanır.</p></div>
+          <div class="mile"><span>Eylül 2026</span><strong>Pilot</strong><p>Seçili marketlerde MVP.</p></div>
+          <div class="mile"><span>Kasım 2026</span><strong>İyileştirme</strong><p>Hız ve güvenlik optimizasyonları.</p></div>
+          <div class="mile"><span>Ocak 2027</span><strong>SaaS</strong><p>Abonelik ve yönetim paneli aktifleştirme.</p></div>
+          <div class="mile"><span>Mayıs 2027</span><strong>Lansman & Büyüme</strong><p>Resmi lansman ve iş birlikleri.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2 class="section-title">İletişim</h2>
+      <p class="section-lead">Pilot program, entegrasyon ve iş birliği için bize ulaşın.</p>
+      <div class="cards">
+        <div class="cardX reveal">
+          <h3>Hızlı Form</h3>
+          <form id="contactForm" onsubmit="return false" style="display:grid; gap:12px">
+            <input required placeholder="Ad Soyad" aria-label="Ad Soyad" style="padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--text)">
+            <input required type="email" placeholder="E-posta" aria-label="E-posta" style="padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--text)">
+            <input placeholder="Şirket / Market" aria-label="Şirket" style="padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--text)">
+            <textarea placeholder="Mesajınız" rows="4" aria-label="Mesaj" style="padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--text)"></textarea>
+            <button class="cta" style="border:0; cursor:pointer; justify-content:center">Gönder</button>
+            <div id="formMsg" style="color:var(--muted)"></div>
+          </form>
+        </div>
+        <div class="cardX reveal">
+          <h3>Diğer Kanallar</h3>
+          <p>Telefon: <strong>+90 538 041 19 66</strong><br>E-posta: <strong>sepetigo@gmail.com</strong><br>Web: <strong>www.sepetigo.com.tr</strong></p>
+          <div class="socials">
+            <a href="#" aria-label="LinkedIn">LinkedIn</a>
+            <a href="#" aria-label="X">X</a>
+            <a href="#" aria-label="YouTube">YouTube</a>
+          </div>
+          <p style="margin-top:10px; font-size:12px">KVKK Aydınlatma Metni ve Rıza Onayı Metni <em>Çok yakında</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom:8px"><span class="logo"></span><span>Sepetigo</span></div>
+        <small>© <span id="y"></span> Sepetigo. Tüm hakları saklıdır.</small>
+      </div>
+      <div style="text-align:right">
+        <a href="#home" class="backtop">Başa dön ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const headerEl = document.querySelector('header');
+    const mbtn = document.getElementById('menuBtn');
+    const mnav = document.getElementById('mobileNav');
+
+    function syncMobileNav(){ if(window.innerWidth > 980){ mnav.style.display = 'none'; } }
+    addEventListener('resize', syncMobileNav); syncMobileNav();
+
+    if(mbtn){ mbtn.addEventListener('click', ()=>{ const shown = mnav.style.display === 'block'; mnav.style.display = shown ? 'none' : 'block'; }) }
+
+    // Smooth anchor scroll WITH offset for fixed header
+    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || headerEl.offsetHeight;
+    function smoothScrollTo(target){
+      const y = target.getBoundingClientRect().top + window.pageYOffset - (headerH + 10);
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+    function bindSmoothLinks(root){
+      root.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          const id = a.getAttribute('href');
+          if(id && id.length>1){
+            const el = document.querySelector(id);
+            if(el){ e.preventDefault(); smoothScrollTo(el); if(mnav) mnav.style.display='none'; }
+          }
+        });
+      });
+    }
+    bindSmoothLinks(document);
+
+    // reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, {threshold:.16});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    // fake form submit
+    const form = document.getElementById('contactForm');
+    const msg = document.getElementById('formMsg');
+    if(form){
+      form.addEventListener('submit', ()=>{
+        msg.textContent = 'Teşekkürler! Mesajınız alındı. En kısa sürede dönüş yapacağız.';
+        setTimeout(()=>{ msg.textContent=''; form.reset(); }, 4600);
+      });
+    }
+
+    // active nav highlight by section in view
+    const sections = Array.from(document.querySelectorAll('main[id], section[id]'));
+    const links = Array.from(document.querySelectorAll('nav a[href^="#"]'));
+    function setActive(id){ links.forEach(l=>l.classList.toggle('active', l.getAttribute('href') === `#${id}`)); }
+    const spy = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){ setActive(en.target.id); } }) }, {rootMargin:`-${headerH+20}px 0px -70% 0px`, threshold:0.1});
+    sections.forEach(s=>spy.observe(s));
+  </script>
+</body>
+</html>
